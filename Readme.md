@@ -1,206 +1,91 @@
-# 🔐 Spring Boot Role-Based Access Control (RBAC)
+# 🔐 Role-Based Access Control (RBAC) System
 
-## 📌 Project Overview
-
-This project demonstrates **Role-Based Access Control (RBAC)** using **Spring Boot** and **Spring Security**.
-It implements authentication, authorization, and secured REST APIs based on user roles.
+A robust Full-Stack RBAC implementation using **Spring Boot 3.x** and **React**. This project demonstrates secure authentication, hierarchical role authorization, and a responsive UI that dynamically adapts based on user permissions.
 
 ---
 
-## 🚀 Features
+## 📸 visual Walkthrough
 
-* 🔑 User Authentication (Login)
-* 🛡️ Role-Based Authorization (USER / ADMIN)
-* 🔒 Secured REST APIs
-* 💾 H2 In-Memory Database
-* ⚙️ Spring Security Configuration
-* 📡 HTTP Status Handling (401 / 403)
+### 1. Secure Login
+![Login UI](./screenshots/login.png)
+*Modern Material-UI login with real-time validation and error handling for unauthorized/invalid attempts.*
+
+### 2. User Dashboard
+![User Dashboard](./screenshots/user_dashboard.png)
+*Dynamic dashboard for users with `ROLE_USER`. Accesses protected profile data via authenticated REST calls.*
+
+### 3. Admin Control Panel
+![Admin Dashboard](./screenshots/admin_dashboard.png)
+*High-level dashboard for users with `ROLE_ADMIN`. Demonstrates **Inherited Access**, where admins can view both Admin-only metrics and standard User profile data.*
+
+### 4. Security Enforcement (Access Denied)
+![Access Denied](./screenshots/access_denied.png)
+*Server-side and Client-side protection ensure that standard users are blocked from Admin routes with clear feedback.*
+
+---
+
+## 🚀 Key Features
+
+*   **⚡ Modern Tech Stack**: Spring Boot 3.5+, React 18+, and Material-UI.
+*   **🛡️ Secure Authentication**: Basic Auth implementation with BCrypt password hashing.
+*   **⚖️ Granular RBAC**: Strict separation between `USER` and `ADMIN` scopes.
+*   **🔗 Unified Security**: Centralized CORS and Security Filter Chain configuration.
+*   **💾 Auto-Seeding**: H2 in-memory database auto-populates with test users on startup.
+*   **📱 Responsive UI**: React frontend dynamically renders components and navigation links based on the authenticated user's role.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* Java
-* Spring Boot
-* Spring Security
-* Spring Data JPA (Hibernate)
-* H2 Database
-* Maven
+### Backend
+*   **Framework**: Spring Boot 3.5.13
+*   **Security**: Spring Security 6+
+*   **DB**: H2 In-Memory Database
+*   **ORM**: Spring Data JPA / Hibernate
+*   **Language**: Java 17+
+
+### Frontend
+*   **Framework**: React 18
+*   **UI Library**: Material-UI (MUI)
+*   **State**: SessionStorage based Auth
+*   **API Client**: Axios with Interceptors
 
 ---
 
-## 📂 Project Structure
+## 📡 API Endpoints & Access Grid
 
-```
-src/main/java/com/example/demo
-│
-├── config        # Security configuration
-├── controller    # REST controllers
-├── entity        # JPA entities
-├── repository    # Database layer
-├── service       # Business logic
-└── DemoApplication.java
-```
+| Endpoint | Method | Required Role | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/public/**` | ANY | NONE | Publicly accessible endpoints. |
+| `/api/user/**` | GET | `USER` or `ADMIN` | User profile data. Admins have inherited access. |
+| `/api/admin/**` | GET | `ADMIN` | Restricted administrative system data. |
 
 ---
 
-## 🔐 Roles & Access Control
+## 🔑 Default Test Accounts
 
-| Role   | Access           |
-| ------ | ---------------- |
-| USER   | `/api/user/**`   |
-| ADMIN  | `/api/admin/**`  |
-| PUBLIC | `/api/public/**` |
-
----
-
-## 📡 API Endpoints
-
-### 🌐 Public API
-
-```
-GET /api/public/hello
-```
-
-### 👤 User API (Requires USER role)
-
-```
-GET /api/user/profile
-```
-
-### 👑 Admin API (Requires ADMIN role)
-
-```
-GET /api/admin/dashboard
-```
+| Username | Password | Assigned Role |
+| :--- | :--- | :--- |
+| **`admin1`** | `password` | `ROLE_ADMIN` |
+| **`user1`** | `password` | `ROLE_USER` |
+| **`admin`** | `admin` | `ROLE_ADMIN` |
 
 ---
 
-## 🔑 Default Users
+## ⚙️ How to Run
 
-| Username | Password | Role       |
-| -------- | -------- | ---------- |
-| user1    | admin123 | ROLE_USER  |
-| admin1   | admin123 | ROLE_ADMIN |
+### 1. Backend (8081)
+1.  Navigate to `/demo` folder.
+2.  Run `./mvnw spring-boot:run` or run `DemoApplication.java` from your IDE.
+3.  The backend will start at `http://localhost:8081`.
 
----
-
-## 🧪 Testing with Postman
-
-### 1️⃣ Unauthorized Request (No Auth)
-
-```
-GET /api/user/profile
-```
-
-➡️ Response: **401 Unauthorized**
-
----
-
-### 2️⃣ Valid USER Access
-
-```
-GET /api/user/profile
-Auth: user1 / admin123
-```
-
-➡️ Response: **200 OK**
-
----
-
-### 3️⃣ USER accessing ADMIN API
-
-```
-GET /api/admin/dashboard
-Auth: user1 / admin123
-```
-
-➡️ Response: **403 Forbidden**
-
----
-
-### 4️⃣ ADMIN Access
-
-```
-GET /api/admin/dashboard
-Auth: admin1 / admin123
-```
-
-➡️ Response: **200 OK**
-
----
-
-### 5️⃣ Invalid Login
-
-```
-Auth: wrong credentials
-```
-
-➡️ Response: **401 Unauthorized**
-
----
-
-## 📸 Screenshots
-
-Include the following screenshots:
-
-* ✅ Login with valid credentials
-* ✅ Successful access to secured endpoint
-* ✅ USER accessing USER endpoint
-* ✅ USER denied access to ADMIN endpoint (403)
-* ⭐ Unauthorized request (401)
-* ⭐ Invalid login attempt
-
----
-
-## ⚙️ Configuration
-
-### application.properties
-
-```properties
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.username=sa
-spring.datasource.password=
-
-spring.jpa.hibernate.ddl-auto=create
-spring.jpa.show-sql=true
-
-spring.h2.console.enabled=true
-server.port=8081
-```
-
----
-
-## ▶️ How to Run
-
-1. Clone the repository
-2. Open in IntelliJ / Eclipse
-3. Run `DemoApplication`
-4. Access APIs via browser or Postman
-
----
-
-## 🎯 Learning Outcomes
-
-* Understanding Spring Security
-* Implementing RBAC
-* Securing REST APIs
-* Handling HTTP status codes
-* Working with H2 database
-
----
-
-## 🚀 Future Improvements
-
-* JWT Authentication
-* Refresh Tokens
-* Role hierarchy
-* Frontend integration (React)
+### 2. Frontend (3000)
+1.  Navigate to `/frontend` folder.
+2.  Install dependencies: `npm install`
+3.  Start the app: `npm start`
+4.  The frontend will open at `http://localhost:3000`.
 
 ---
 
 ## 👨‍💻 Author
-
-Adarsh Kumar
-
----
+**Adarsh Kumar**
